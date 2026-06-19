@@ -90,10 +90,36 @@ async function deleteAirplane(req , res){
     }
 }
 
+/**
+ * PATCH : /airplane/:id
+ * req-body :{ modelNumber: {} , capacity: {}}
+ */
+
+async function updateAirplane(req, res){
+    try {
+        const airplane = await airplaneService.updateAirplane(req.params.id ,
+        {
+            modelNumber: req.body.modelNumber,
+            capacity: req.body.capacity
+        }
+        );
+        SuccessResponse.message = "successfully updated the plane";
+        SuccessResponse.data = airplane;
+        return res
+                 .status(StatusCodes.OK)
+                 .json(SuccessResponse);
+    } catch (error) {
+        ErrorResponse.message = error.message || 'id not present ';
+        return res
+                  .status(error.statusCode || StatusCodes.NOT_FOUND)
+                  .json(ErrorResponse);
+    }
+}
 
 module.exports = {
     createAirplane,
     getAirplanes,
     getAirplane,
-    deleteAirplane
+    deleteAirplane,
+    updateAirplane
 }

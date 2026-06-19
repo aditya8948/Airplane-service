@@ -43,13 +43,13 @@ async getAll(){
 }
 
 async update(id , data){
-        const response = await  this.model.update(data ,{
-            where:{
-                id : id
-            }
-        })
-        return response;
-    
+        const [response] = await this.model.update(data, {
+            where: { id }
+        });
+        if(response === 0){
+            throw new AppError('not able to find resource on this id ');
+        }
+        return await this.model.findByPk(id);
 }
 
 }

@@ -54,9 +54,19 @@ async function deleteAirplane(id){
     }
 }
 
+async function updateAirplane(id , data ){
+    try {
+        const response = await airplaneRepository.update(id, data);
+        return response;
+    } catch (error) {
+        throw new AppError('The airplane you request to update is not present ' ,StatusCodes.NOT_FOUND);
+    }
+}
+
 module.exports ={
     createAirplane,
     getAirplanes,
     getAirplane,
-    deleteAirplane
+    deleteAirplane,
+    updateAirplane
 }
