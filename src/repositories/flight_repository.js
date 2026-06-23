@@ -42,7 +42,7 @@ class FlightRepository extends crudRepository {
                     "=",
                     Sequelize.col("arrival_airport.code")
                 ),
-                 include: [{
+                  include: [{
                     model: City,
                     as: 'city',
                     required: true
