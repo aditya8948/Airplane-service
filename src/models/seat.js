@@ -38,6 +38,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: ECONOMY,
       allowNull: false 
     },
+  }, {
     sequelize,
     modelName: 'Seat',
   });
