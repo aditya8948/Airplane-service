@@ -65,9 +65,18 @@ npm run dev
 ```
 You should see: `Server is running on port 3000` and `succesfully started the server`.
 
+### 5. Run with Docker
+Build and run the service container:
+```bash
+docker build -t flight-info-service .
+docker run --env-file .env -p 3000:3000 flight-info-service
+```
+
+The container exposes port `3000` by default. Update your `.env` database host as needed when connecting from Docker to a local MySQL instance.
+
 ---
 
-## 🚀 API Endpoints
+## API Endpoints
 
 Here are some of the main endpoints you can test using Postman:
 
