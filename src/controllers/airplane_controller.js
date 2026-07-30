@@ -1,33 +1,24 @@
-const {StatusCodes} = require('http-status-codes');
-const {airplaneService} = require('../services');
-
-const{ErrorResponse , SuccessResponse} = require('../utils/common');
-const { json } = require('sequelize');
+const { StatusCodes } = require('http-status-codes');
+const { airplaneService } = require('../services');
+const { ErrorResponse, SuccessResponse } = require('../utils/common');
 
 /*
-
 POST : /airplane
 req-body { modelNumber : 'airbusa30' , capacity: 200}
 */
-
-async function createAirplane(req , res){
+async function createAirplane(req, res) {
     try {
         const airplane = await airplaneService.createAirplane({
             modelNumber: req.body.modelNumber,
             capacity: req.body.capacity
-        })
-        SuccessResponse.message = 'succesfully create a file ';
-        SuccessResponse.data = airplane;
+        });
         return res
                 .status(StatusCodes.CREATED)
-                .json(SuccessResponse)
+                .json(new SuccessResponse(airplane, 'successfully created the airplane'));
     } catch (error) {
-        ErrorResponse.message = error.message || 'Something went wrong while creating airplane';
-        ErrorResponse.error = error.explanation || error.message;
         return res
-                  .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
-                  .json(ErrorResponse);
-        
+                .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+                .json(new ErrorResponse(error.explanation || error.message, error.message || 'Something went wrong while creating airplane'));
     }
 }
 
@@ -35,18 +26,16 @@ async function createAirplane(req , res){
  * GET : /airplane/
  * req-body {}
  */
-async function getAirplanes(req , res) {
+async function getAirplanes(req, res) {
     try {
         const AllAirplanes = await airplaneService.getAirplanes();
-        SuccessResponse.data = AllAirplanes;
         return res
-                  .status(StatusCodes.OK)
-                  .json(SuccessResponse); 
+                .status(StatusCodes.OK)
+                .json(new SuccessResponse(AllAirplanes, 'successfully fetched all airplanes'));
     } catch (error) {
-        ErrorResponse.error = error;
         return res
-                 .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
-                 .json(ErrorResponse);
+                .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+                .json(new ErrorResponse(error.explanation || error.message, error.message || 'Cannot fetch airplanes'));
     }
 }
 
@@ -54,18 +43,16 @@ async function getAirplanes(req , res) {
  * GET : /airplane/:id
  * req-body {}
  */
-async function getAirplane(req , res){
+async function getAirplane(req, res) {
     try {
         const airplane = await airplaneService.getAirplane(req.params.id);
-        SuccessResponse.data = airplane;
         return res
-                  .status(StatusCodes.OK)
-                  .json(SuccessResponse)
+                .status(StatusCodes.OK)
+                .json(new SuccessResponse(airplane, 'successfully fetched the airplane'));
     } catch (error) {
-        ErrorResponse.error = error;
         return res
-                 .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
-                 .json(ErrorResponse);
+                .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+                .json(new ErrorResponse(error.explanation || error.message, error.message || 'Cannot fetch airplane details'));
     }
 }
 
@@ -73,20 +60,16 @@ async function getAirplane(req , res){
  * Delete : /airplane/:id
  * req-body :{}
  */
-async function deleteAirplane(req , res){
+async function deleteAirplane(req, res) {
     try {
         const airplane = await airplaneService.deleteAirplane(req.params.id);
-        SuccessResponse.message = 'succesfully deleted a file ';
-        SuccessResponse.data = airplane;
         return res
                 .status(StatusCodes.OK)
-                .json(SuccessResponse)
+                .json(new SuccessResponse(airplane, 'successfully deleted the airplane'));
     } catch (error) {
-        ErrorResponse.error = error;
         return res
-                  .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
-                  .json(ErrorResponse);
-        
+                .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+                .json(new ErrorResponse(error.explanation || error.message, error.message || 'Cannot delete airplane'));
     }
 }
 
@@ -94,25 +77,19 @@ async function deleteAirplane(req , res){
  * PATCH : /airplane/:id
  * req-body :{ modelNumber: {} , capacity: {}}
  */
-
-async function updateAirplane(req, res){
+async function updateAirplane(req, res) {
     try {
-        const airplane = await airplaneService.updateAirplane(req.params.id ,
-        {
+        const airplane = await airplaneService.updateAirplane(req.params.id, {
             modelNumber: req.body.modelNumber,
             capacity: req.body.capacity
-        }
-        );
-        SuccessResponse.message = "successfully updated the plane";
-        SuccessResponse.data = airplane;
+        });
         return res
-                 .status(StatusCodes.OK)
-                 .json(SuccessResponse);
+                .status(StatusCodes.OK)
+                .json(new SuccessResponse(airplane, 'successfully updated the airplane'));
     } catch (error) {
-        ErrorResponse.message = error.message || 'id not present ';
         return res
-                  .status(error.statusCode || StatusCodes.NOT_FOUND)
-                  .json(ErrorResponse);
+                .status(error.statusCode || StatusCodes.NOT_FOUND)
+                .json(new ErrorResponse(error.explanation || error.message, error.message || 'Cannot update airplane'));
     }
 }
 
@@ -122,4 +99,4 @@ module.exports = {
     getAirplane,
     deleteAirplane,
     updateAirplane
-}
+};

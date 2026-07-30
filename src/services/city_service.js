@@ -17,7 +17,7 @@ async function createCity(data){
             error.errors.forEach((err)=> {
                 explanation.push(err.message);
             });
-         throw new AppError(explanation , StatusCodes.INTERNAL_SERVER_ERROR);
+         throw new AppError(explanation , StatusCodes.BAD_REQUEST);
          }
          throw new AppError('cannot create a new city object ', StatusCodes.INTERNAL_SERVER_ERROR);
     }
@@ -45,7 +45,7 @@ async function updateCity(id , data ){
         const response = await cityRepository.update(id , data);
         return response;
     } catch (error) {
-         throw new AppError('The airplane you request to update is not present ' ,StatusCodes.NOT_FOUND);
+         throw new AppError('The city you request to update is not present ' ,StatusCodes.NOT_FOUND);
     }
 
 }

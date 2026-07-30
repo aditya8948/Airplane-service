@@ -1,8 +1,7 @@
 const crudRepository = require('./crud_repositories');
-const Sequelize = require('sequelize')
 const{Flight,Airplane,Airport,City} = require('../models');
-const db = require('../models');
-const{addRowLockOnFlight} =require('./queries')
+const AppError = require('../utils/errors/app_error');
+const { StatusCodes } = require('http-status-codes');
 
 class FlightRepository extends crudRepository {
     constructor(){
@@ -23,12 +22,6 @@ class FlightRepository extends crudRepository {
                 model: Airport,
                 required: true,
                 as: 'departure_airport',
-                on: Sequelize.where(
-                    Sequelize.col("Flight.departureAirportId"),
-                    "=",
-                    Sequelize.col("departure_airport.code")
-                ),
-                // nested join to city
                 include: [{
                     model: City,
                     as: 'city',
@@ -39,12 +32,7 @@ class FlightRepository extends crudRepository {
                 model: Airport,
                 required: true,
                 as: 'arrival_airport',
-                on: Sequelize.where(
-                    Sequelize.col("Flight.arrivalAirportId"),
-                    "=",
-                    Sequelize.col("arrival_airport.code")
-                ),
-                  include: [{
+                include: [{
                     model: City,
                     as: 'city',
                     required: true
@@ -55,19 +43,24 @@ class FlightRepository extends crudRepository {
         return response;
     }
 
-    async UpdateRemainingSeats(flight_id, seats, dec = true){
-       // add row l ock (pessimistic concurrency control)
-        await db.sequelize.query(addRowLockOnFlight(flight_id));
-
-
-        const flight = await Flight.findByPk(flight_id);
+    async UpdateRemainingSeats(flight_id, seats, dec = true, transaction){
+        const flight = await Flight.findByPk(flight_id, {
+            transaction,
+            lock: transaction.LOCK.UPDATE
+        });
+        if(!flight){
+            throw new AppError('Not able to find the flight with the given id', StatusCodes.NOT_FOUND);
+        }
+        if(dec && flight.totalSeats < seats){
+            throw new AppError('Not enough seats available on this flight', StatusCodes.BAD_REQUEST);
+        }
         if(dec){
-            await flight.decrement('totalSeats', {by: seats});
+            await flight.decrement('totalSeats', {by: seats, transaction});
         }else{ 
-        await flight.increment('totalSeats', {by: seats});
+            await flight.increment('totalSeats', {by: seats, transaction});
         }
-        return flight;
-        }
+        return await flight.reload({ transaction });
+    }
         
 }
 

@@ -1,8 +1,10 @@
-const success  = {
-    success: true,
-    message: 'successfully completed the request',
-    data: {},
-    error: {}
+class SuccessResponse {
+    constructor(data = {}, message = 'successfully completed the request') {
+        this.success = true;
+        this.message = message;
+        this.data = data;
+        this.error = {};
+    }
 }
 
-module.exports = success;
+module.exports = SuccessResponse;

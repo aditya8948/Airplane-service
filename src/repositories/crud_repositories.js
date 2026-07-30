@@ -42,14 +42,13 @@ async getAll(){
    
 }
 
-async update(id , data){
-        const [response] = await this.model.update(data, {
-            where: { id }
-        });
-        if(response === 0){
-            throw new AppError('not able to find resource on this id ');
+async update(id, data){
+        const record = await this.model.findByPk(id);
+        if(!record){
+            throw new AppError('Not able to find the resource with the given id', StatusCodes.NOT_FOUND);
         }
-        return await this.model.findByPk(id);
+        const response = await record.update(data);
+        return response;
 }
 
 }

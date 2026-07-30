@@ -2,6 +2,7 @@ const { StatusCodes } = require('http-status-codes');
 const {FlightRepository} = require('../repositories');
 const AppError = require('../utils/errors/app_error');
 const { Op } = require('sequelize');
+const db = require('../models');
 
 const flightRepository = new FlightRepository();
 
@@ -89,11 +90,21 @@ async function getFlight(id){
 }
 
 async function updateSeats(data){
+    const transaction = await db.sequelize.transaction();
     try {
-        const response = await flightRepository.UpdateRemainingSeats(data.flightId, data.seats, data.dec)
+        const seats = Number(data.seats);
+        if(!Number.isInteger(seats) || seats <= 0){
+            throw new AppError('seats should be a positive integer', StatusCodes.BAD_REQUEST);
+        }
+        const dec = data.dec === undefined ? true : data.dec === true || data.dec === 'true';
+        const response = await flightRepository.UpdateRemainingSeats(data.flightId, seats, dec, transaction);
+        await transaction.commit();
         return response;
     } catch (error) {
-        console.log(error);
+        await transaction.rollback();
+        if(error instanceof AppError){
+            throw error;
+        }
         throw new AppError('Cannot update data of the flight ', StatusCodes.INTERNAL_SERVER_ERROR);  
     }
 }

@@ -1,10 +1,6 @@
 node_modules/
 .env
 src/config/config.json
-notes.txt
-ormNote.txt
 config/config.json
-interview question.txt
-myNotes.txt
 .swp
 .DS_Store
